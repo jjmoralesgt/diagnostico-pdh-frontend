@@ -4,7 +4,7 @@ const Button = (props) => {
   return (
     <button
       type={props.type || 'button'}      
-      className="btn-primary"
+      className={props.class}
       onClick={props.onClick}
       disabled={props.disabled}
     >

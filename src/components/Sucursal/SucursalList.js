@@ -1,5 +1,6 @@
 import Sucursal from "./Sucursal";
-import { Button, Table } from "react-bootstrap";
+import Button from "../UI/Button/Button";
+import { Table } from "react-bootstrap";
 
 
 const SucursalList = (props) => {
@@ -27,9 +28,9 @@ const SucursalList = (props) => {
                         <td>{sucursal.nombre}</td>
                         <td>{sucursal.nombre_admin}</td>
                         <td>
-                            <Button variant="success">Editar</Button>
+                            <Button class="btn btn-success">Editar</Button>
 
-                            <Button variant="danger">Eliminar</Button>
+                            <Button class="btn btn-danger">Eliminar</Button>
                         </td>
                     </Sucursal>
                 ))}
