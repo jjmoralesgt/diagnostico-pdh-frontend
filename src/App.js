@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Header from "./components/Layout/Header";
-import Main from "./components/Layout/Main";
+import useHttp from "./hooks/use-http";
+import Button from "./components/UI/Button/Button";
+import SucursalForm from "./components/Sucursal/SucursalForm";
+import SucursalList from "./components/Sucursal/SucursalList";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
@@ -13,11 +15,56 @@ function App() {
   const hideModalHandler = () => {
     setModalIsShown(false);
   };
+
+  const [sucursals, setSucursals] = useState([]);
+
+  const { isLoading, error, sendRequest: fetchSucursals } = useHttp();
+
+
+  useEffect(() => {
+    const transformSucursal = sucursalObj => {
+      const loadedSucursals = [];
+
+      for (const sucursalKey in sucursalObj) {
+        loadedSucursals.push({ id: sucursalKey, nombre: sucursalObj[sucursalKey].nombre, nombre_admin: sucursalObj[sucursalKey].nombre_admin });
+      }
+
+      setSucursals(loadedSucursals);
+    };
+    fetchSucursals(
+      { url: 'http://127.0.0.1:8000/api/sucursal' },
+      transformSucursal
+    );
+  }, [fetchSucursals]);
+
+  const sucursalAddHandler = (sucursal) => {
+    setSucursals((prevSucursals) => prevSucursals.concat(sucursal));
+  };
   return (
     <React.Fragment>
-      <div className="container">
-        <Header />
-        <Main />
+      <div className="container">        
+        <div className="row justify-content-md-center">
+          <div className="row">
+            <div className="col-md-8">
+              <h1 className="display-5">Lista de Sucursales</h1>
+            </div>
+            <div className="col-md-4 text-center">
+              <Button type="button" class="btn btn-primary btn-lg" onClick={showModalHanlder}>
+                Nuevo
+              </Button>
+            </div>
+            {modalIsShown && <SucursalForm />}
+          </div>
+          <SucursalList
+            name="Nombre"
+            admin="Administrador"
+            actions="Acciones"
+            items={sucursals}
+            loading={isLoading}
+            error={error}
+            onFetch={fetchSucursals}
+          />
+        </div>
       </div>
     </React.Fragment>
   );
