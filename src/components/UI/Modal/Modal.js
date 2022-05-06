@@ -1,14 +1,15 @@
 import React, { Fragment } from "react";
 import ReactDOM from "react-dom";
-import Button from "../Button/Button";
+import classes from "./Modal.module.css";
 
 const Backdrop = (props) => {
-  return <div className="backdrop" onClick={props.close}></div>;
+  //return <div className="modal-backdrop" onClick={props.onClose}></div>;
+  return <div className={classes.backdrop} onClick={props.onClose}></div>
 };
 
 const ModalOverlay = (props) => {
-  return (
-    <div className="modal">
+  /*return (
+    <div className="modal fade">
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
@@ -19,6 +20,13 @@ const ModalOverlay = (props) => {
             <div className="modal-footer"></div>
           </div>
         </div>
+      </div>
+    </div>
+  );*/
+  return (
+    <div className={classes.modal}>
+      <div className={classes.content}>
+        {props.children}
       </div>
     </div>
   );

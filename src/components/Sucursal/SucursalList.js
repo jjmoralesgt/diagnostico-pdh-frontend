@@ -28,7 +28,7 @@ const SucursalList = (props) => {
                         <td>{sucursal.nombre}</td>
                         <td>{sucursal.nombre_admin}</td>
                         <td>
-                            <Button class="btn btn-success">Editar</Button>
+                            <Button class="btn btn-success" onClick={props.onEdit}>Editar</Button>
 
                             <Button class="btn btn-danger">Eliminar</Button>
                         </td>

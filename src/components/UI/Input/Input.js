@@ -16,17 +16,11 @@ const Input = React.forwardRef((props, ref) => {
         <div
             /*className={`${classes.control} ${props.IsValid === false ? classes.invalid : ''
                 }`}*/
-            className="form-group"
+            className="mb-3"
         >
-            <label htmlFor={props.id}>{props.label}</label>
+            <label htmlFor={props.input.id} className="form-label">{props.label}</label>
             <input 
-                className="form-control" 
-                ref={inputRef}
-                /*type={props.type}
-                id={props.id}
-                value={props.value}
-                onChange={props.onChange}
-                onBlur={props.onBlur}*/
+                className="form-control"                    
                 {...props.input}
             />
         </div>
