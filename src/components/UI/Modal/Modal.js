@@ -8,21 +8,6 @@ const Backdrop = (props) => {
 };
 
 const ModalOverlay = (props) => {
-  /*return (
-    <div className="modal fade">
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <div className="modal-title">
-              <h2>{props.title}</h2>
-            </div>
-            <div className="modal-body">{props.children}</div>
-            <div className="modal-footer"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );*/
   return (
     <div className={classes.modal}>
       <div className={classes.content}>

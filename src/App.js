@@ -1,21 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { Fragment, useState, useEffect } from "react";
 import useHttp from "./hooks/use-http";
 import Button from "./components/UI/Button/Button";
 import SucursalForm from "./components/Sucursal/SucursalForm";
 import SucursalList from "./components/Sucursal/SucursalList";
+import SucursalProvider from "./store/SucursalProvider";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-function App() {
-  const [modalIsShown, setModalIsShown] = useState(false);
+function App(props) {
 
-  const showModalHandler = () => {
-    setModalIsShown(true);
-  };
-
-  const hideModalHandler = () => {
-    setModalIsShown(false);
-  };
-
+  
   const [sucursals, setSucursals] = useState([]);
 
   const { isLoading, error, sendRequest: fetchSucursals } = useHttp();
@@ -26,9 +19,14 @@ function App() {
 
       for (const sucursalKey in sucursalObj) {
         loadedSucursals.push({
-          id: sucursalKey,
+          id: sucursalObj[sucursalKey].id,
           nombre: sucursalObj[sucursalKey].nombre,
           nombre_admin: sucursalObj[sucursalKey].nombre_admin,
+          telefono: sucursalObj[sucursalKey].telefono,
+          direccion: sucursalObj[sucursalKey].direccion,
+          fax: sucursalObj[sucursalKey].fax,
+          cantidad_pedidos: sucursalObj[sucursalKey].cantidad_pedidos,
+
         });
       }
 
@@ -40,30 +38,33 @@ function App() {
     );
   }, [fetchSucursals]);
 
+  const [rows, setRows] = useState();
+  const addRowUpdateHandler = expense => {
+    setRows(expense);  
+  }
+  
+
+  const [modalIsShown, setModalIsShown] = useState(false);
+
+  const showModalHandler = () => {
+    setModalIsShown(true);
+  };
+
+  const hideModalHandler = () => {
+    setModalIsShown(false);
+    setRows('');
+    console.log(rows);    
+    
+  };  
+
+  const dataUpdate = rows;
   /*const sucursalAddHandler = (sucursal) => {
     setSucursals((prevSucursals) => prevSucursals.concat(sucursal));
   };*/
 
-  async function addSucursalHandler(sucursal) {
-
-    //console.log(sucursal);
-
-    const response = await fetch("http://127.0.0.1:8000/api/sucursal", {
-      method: "POST",
-      body: JSON.stringify(sucursal),
-      headers: {
-        "Content-Type": "application/json",        
-      },
-      
-    });
-    const data = await response.json();
-    console.log(data);
-
-    
-  }
-
-  return (
-    <React.Fragment>
+ 
+ return (
+    <SucursalProvider value={dataUpdate}>
       <div className="container">
         <div className="row justify-content-md-center">
           <div className="row">
@@ -81,8 +82,7 @@ function App() {
             </div>
             {modalIsShown && (
               <SucursalForm
-                onClose={hideModalHandler}
-                onAddSucursal={addSucursalHandler}
+                onClose={hideModalHandler}                
                 title="Agregar sucursal"
               />
             )}
@@ -95,11 +95,12 @@ function App() {
             loading={isLoading}
             error={error}
             onFetch={fetchSucursals}
-            onEdit={showModalHandler}
+            onUpdate={showModalHandler}
+            onAddUpdateRow={addRowUpdateHandler}                    
           />
         </div>
       </div>
-    </React.Fragment>
+    </SucursalProvider>
   );
 }
 export default App;

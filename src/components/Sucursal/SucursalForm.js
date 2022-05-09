@@ -1,42 +1,77 @@
-import React, { useState } from "react";
-
+import React, { useState, useContext, useEffect } from "react";
 import Button from "../UI/Button/Button";
-//import Input from "../UI/Input/Input";
 import Modal from "../UI/Modal/Modal";
+import SucursalContext from "../../store/sucursal-context";
 
 const SucursalForm = (props) => {
+  
+  const sucursalCtx = useContext(SucursalContext);    
 
-    const datos = {
-        nombre: "",
-        nombre_admin: "",
-        telefono: "",
-        direccion: "",
-        fax: "",
-        cantidad_pedidos: ""
-    }
-  const [valores, setValores] = useState(datos);
+  const datos = {
+    id: "",
+    nombre: "",
+    nombre_admin: "",
+    telefono: "",
+    direccion: "",
+    fax: "",
+    cantidad_pedidos: "",
+  };
+
+  const [valores, setValores] = useState(sucursalCtx);
 
   const inputChangeHandler = (event) => {
     const { target } = event;
     const { name, value } = target;
-
     const newValues = {
       ...valores,
       [name]: value,
     };
-
-    setValores(newValues);
-
-    //setEnteredNombre(event.target.value);
-    console.log(event);
+    setValores(newValues);   
   };
+
+  
+  /*const sucursalCtx = SucursalContext;
+  setValores(sucursalCtx);*/
+
+  async function addSucursalHandler(sucursal) {
+    const response = await fetch("http://127.0.0.1:8000/api/sucursal", {
+      method: "POST",
+      body: JSON.stringify(sucursal),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    //console.log(data);
+    setValores(datos);
+  }
+
+  async function editSucursalHandler(sucursal) {
+
+  console.log(sucursal);
+    const response = await fetch(
+      "http://127.0.0.1:8000/api/sucursal/" + sucursal.id,
+      {
+        method: "PUT",
+        body: JSON.stringify(sucursal),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+  }
 
   function submitHandler(event) {
     event.preventDefault();
 
+    if(sucursalCtx){
+      editSucursalHandler(valores);
+    } else {
+      addSucursalHandler(valores);
+    }
     
-    props.onAddSucursal(valores);
-    console.log(valores);
   }
 
   return (
@@ -52,7 +87,8 @@ const SucursalForm = (props) => {
             id="nombre"
             name="nombre"
             type="text"
-            onChange={inputChangeHandler}
+            onChange={inputChangeHandler}     
+            value={valores.nombre}       
           />
         </div>
         <div className="mb-3">
@@ -65,6 +101,7 @@ const SucursalForm = (props) => {
             name="nombre_admin"
             type="text"
             onChange={inputChangeHandler}
+            value={valores.nombre_admin} 
           />
         </div>
         <div className="mb-3">
@@ -77,6 +114,7 @@ const SucursalForm = (props) => {
             name="telefono"
             type="text"
             onChange={inputChangeHandler}
+            value={valores.telefono} 
           />
         </div>
         <div className="mb-3">
@@ -89,6 +127,7 @@ const SucursalForm = (props) => {
             name="direccion"
             type="text"
             onChange={inputChangeHandler}
+            value={valores.direccion} 
           />
         </div>
         <div className="mb-3">
@@ -101,8 +140,9 @@ const SucursalForm = (props) => {
             name="fax"
             type="text"
             onChange={inputChangeHandler}
+            value={valores.fax} 
           />
-        </div>       
+        </div>
         <div className="mb-3">
           <label htmlFor="cantidad_pedidos" className="form-label">
             Cantidad de pedidos
@@ -113,6 +153,7 @@ const SucursalForm = (props) => {
             name="cantidad_pedidos"
             type="number"
             onChange={inputChangeHandler}
+            value={valores.cantidad_pedidos} 
           />
         </div>
         <Button type="button" class="btn btn-danger" onClick={props.onClose}>
