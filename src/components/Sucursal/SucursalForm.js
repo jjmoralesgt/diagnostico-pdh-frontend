@@ -1,22 +1,13 @@
 import React, { useState, useContext, useEffect } from "react";
 import Button from "../UI/Button/Button";
 import Modal from "../UI/Modal/Modal";
+//import Alert from "../UI/Alert/Alert";
 import SucursalContext from "../../store/sucursal-context";
+import "react-toastify/dist/ReactToastify.css";
 
 const SucursalForm = (props) => {
+  const sucursalCtx = useContext(SucursalContext);
   
-  const sucursalCtx = useContext(SucursalContext);    
-
-  const datos = {
-    id: "",
-    nombre: "",
-    nombre_admin: "",
-    telefono: "",
-    direccion: "",
-    fax: "",
-    cantidad_pedidos: "",
-  };
-
   const [valores, setValores] = useState(sucursalCtx);
 
   const inputChangeHandler = (event) => {
@@ -26,12 +17,8 @@ const SucursalForm = (props) => {
       ...valores,
       [name]: value,
     };
-    setValores(newValues);   
+    setValores(newValues);
   };
-
-  
-  /*const sucursalCtx = SucursalContext;
-  setValores(sucursalCtx);*/
 
   async function addSucursalHandler(sucursal) {
     const response = await fetch("http://127.0.0.1:8000/api/sucursal", {
@@ -41,14 +28,11 @@ const SucursalForm = (props) => {
         "Content-Type": "application/json",
       },
     });
-    const data = await response.json();
-    //console.log(data);
-    setValores(datos);
+    const data = await response.json();   
+    setValores(valores);
   }
 
   async function editSucursalHandler(sucursal) {
-
-  console.log(sucursal);
     const response = await fetch(
       "http://127.0.0.1:8000/api/sucursal/" + sucursal.id,
       {
@@ -60,18 +44,20 @@ const SucursalForm = (props) => {
       }
     );
     const data = await response.json();
-    console.log(data);
+    valores.action = "UPDATE";
+    console.log("editando");
   }
 
   function submitHandler(event) {
     event.preventDefault();
-
-    if(sucursalCtx){
+    if (sucursalCtx.id > 0) {
       editSucursalHandler(valores);
     } else {
       addSucursalHandler(valores);
     }
-    
+
+    props.onClose();
+    props.onAddSucursal(valores);
   }
 
   return (
@@ -87,8 +73,9 @@ const SucursalForm = (props) => {
             id="nombre"
             name="nombre"
             type="text"
-            onChange={inputChangeHandler}     
-            value={valores.nombre}       
+            onChange={inputChangeHandler}
+            value={valores.nombre}
+            required
           />
         </div>
         <div className="mb-3">
@@ -101,7 +88,7 @@ const SucursalForm = (props) => {
             name="nombre_admin"
             type="text"
             onChange={inputChangeHandler}
-            value={valores.nombre_admin} 
+            value={valores.nombre_admin}
           />
         </div>
         <div className="mb-3">
@@ -114,7 +101,7 @@ const SucursalForm = (props) => {
             name="telefono"
             type="text"
             onChange={inputChangeHandler}
-            value={valores.telefono} 
+            value={valores.telefono}
           />
         </div>
         <div className="mb-3">
@@ -127,7 +114,7 @@ const SucursalForm = (props) => {
             name="direccion"
             type="text"
             onChange={inputChangeHandler}
-            value={valores.direccion} 
+            value={valores.direccion}
           />
         </div>
         <div className="mb-3">
@@ -140,7 +127,7 @@ const SucursalForm = (props) => {
             name="fax"
             type="text"
             onChange={inputChangeHandler}
-            value={valores.fax} 
+            value={valores.fax}
           />
         </div>
         <div className="mb-3">
@@ -153,7 +140,7 @@ const SucursalForm = (props) => {
             name="cantidad_pedidos"
             type="number"
             onChange={inputChangeHandler}
-            value={valores.cantidad_pedidos} 
+            value={valores.cantidad_pedidos}
           />
         </div>
         <Button type="button" class="btn btn-danger" onClick={props.onClose}>
