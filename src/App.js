@@ -1,12 +1,13 @@
-import { Fragment, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { ToastContainer } from "react-toastify";
 import useHttp from "./hooks/use-http";
+import SucursalProvider from "./store/SucursalProvider";
 import Button from "./components/UI/Button/Button";
 import SucursalForm from "./components/Sucursal/SucursalForm";
 import SucursalList from "./components/Sucursal/SucursalList";
-import { ToastContainer } from "react-toastify";
-import SucursalProvider from "./store/SucursalProvider";
-import "bootstrap/dist/css/bootstrap.min.css";
 import Swal from "sweetalert2";
+import Alert from "./components/UI/Alert/Alert";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App(props) {
   const [sucursals, setSucursals] = useState([]);
@@ -47,29 +48,40 @@ function App(props) {
     cantidad_pedidos: ""
   };
 
-  const [rows, setRows] = useState(datos);
-
-  const updateRowHandler = (sucursal) => {
-    setRows(sucursal);
-  };
-
-  const dataUpdate = rows;
-
-  const onAddSucursalHandler = (sucursal) => {   
-    
-    
+  const addSucursalHandler = (sucursal) => {    
       setSucursals((prevSucursals) => {
         return [sucursal, ...prevSucursals];
       });    
   };
 
+  const [rows, setRows] = useState(datos);
+
+  const setDataUpdateSucursalHandler = (sucursal) => {    
+      setRows(sucursal);      
+  };
+  const dataUpdate = rows;
+
+  const updateSucursalHandler = (sucursal) => {
+    const lastSucursals = sucursals.filter((data) => data.id !== sucursal.id);  
+    setSucursals(lastSucursals);
+    setSucursals((prevSucursals) => {
+      return [sucursal, ...prevSucursals];
+    })
+  }
+
   async function deleteRowHandler(sucursal) {
-    await fetch("http://127.0.0.1:8000/api/sucursal/" + sucursal.id, {
+    const response = await fetch("http://127.0.0.1:8000/api/sucursal/" + sucursal.id, {
       method: "delete",
     });
 
-    const lastSucursals = sucursals.filter((data) => data.id !== sucursal.id);
-    setSucursals(lastSucursals);
+    const data = await response.json();
+    if(data.respuesta !== "success"){
+      Alert("warning", data.mensaje);      
+    } else {      
+      const lastSucursals = sucursals.filter((data) => data.id !== sucursal.id);
+      setSucursals(lastSucursals);
+      Alert("success", data.mensaje);
+    }
   }
 
   const confirmDeleteHandler = (sucursal) => {
@@ -120,7 +132,8 @@ function App(props) {
             {modalIsShown && (
               <SucursalForm
                 title="Agregar sucursal"
-                onAddSucursal={onAddSucursalHandler}
+                onAddSucursal={addSucursalHandler}
+                onUpdateSucursal={updateSucursalHandler}                
                 onClose={hideModalHandler}
               />
             )}
@@ -135,7 +148,7 @@ function App(props) {
             items={sucursals}
             onFetch={fetchSucursals}
             openModal={showModalHandler}
-            onUpdateRow={updateRowHandler}
+            onUpdateRow={setDataUpdateSucursalHandler}
             onDeleteRow={confirmDeleteHandler}
           />
           <ToastContainer />

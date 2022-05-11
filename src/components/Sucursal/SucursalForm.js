@@ -4,6 +4,7 @@ import Modal from "../UI/Modal/Modal";
 //import Alert from "../UI/Alert/Alert";
 import SucursalContext from "../../store/sucursal-context";
 import "react-toastify/dist/ReactToastify.css";
+import Alert from "../UI/Alert/Alert";
 
 const SucursalForm = (props) => {
   const sucursalCtx = useContext(SucursalContext);
@@ -22,14 +23,21 @@ const SucursalForm = (props) => {
 
   async function addSucursalHandler(sucursal) {
     const response = await fetch("http://127.0.0.1:8000/api/sucursal", {
-      method: "POST",
+      method: "POST",      
       body: JSON.stringify(sucursal),
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json",       
       },
     });
-    const data = await response.json();   
-    setValores(valores);
+    const data = await response.json();
+
+    if(data.respuesta !== "success"){
+      Alert("warning", data.mensaje);      
+    } else {      
+      setValores(valores);
+      props.onAddSucursal(valores);      
+      Alert("success", data.mensaje);
+    }    
   }
 
   async function editSucursalHandler(sucursal) {
@@ -43,21 +51,24 @@ const SucursalForm = (props) => {
         },
       }
     );
-    const data = await response.json();
-    valores.action = "UPDATE";
-    console.log("editando");
+    const data = await response.json();    
+    if(data.respuesta !== "success"){
+      Alert("warning", data.mensaje);      
+    } else {            
+      props.onUpdateSucursal(valores);
+      Alert("success", data.mensaje);
+    }   
   }
 
   function submitHandler(event) {
     event.preventDefault();
     if (sucursalCtx.id > 0) {
-      editSucursalHandler(valores);
+      editSucursalHandler(valores);     
     } else {
-      addSucursalHandler(valores);
+      addSucursalHandler(valores);     
     }
-
     props.onClose();
-    props.onAddSucursal(valores);
+    
   }
 
   return (

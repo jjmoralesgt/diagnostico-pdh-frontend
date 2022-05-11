@@ -1,8 +1,9 @@
 import Sucursal from "./Sucursal";
 import Button from "../UI/Button/Button";
+import ReactPaginate from "react-paginate";
 
 const SucursalList = (props) => {
-    const sendRowUpdateHandler = (data) =>{
+    const updateRowHandler = (data) =>{
         props.openModal();
         props.onUpdateRow(data);        
     }
@@ -12,7 +13,7 @@ const SucursalList = (props) => {
     }
     
   let sucursalList = "";
-
+  console.log(props.items);
   sucursalList = (
     <table className="table table-striped table-bordered table-hover">
       <thead>
@@ -34,7 +35,7 @@ const SucursalList = (props) => {
             <td>{sucursal.telefono}</td>
             <td>{sucursal.cantidad_pedidos}</td>
             <td>
-              <Button class="btn btn-success" sucursal={sucursal.id} onClick={() => {sendRowUpdateHandler(sucursal)}}>Editar</Button>
+              <Button class="btn btn-success" sucursal={sucursal.id} onClick={() => {updateRowHandler(sucursal)}}>Editar</Button>
               <Button class="btn btn-danger" sucursal={sucursal.id} onClick={() => {deleteRowHandler(sucursal)}}>Eliminar</Button>
             </td>
           </Sucursal>
