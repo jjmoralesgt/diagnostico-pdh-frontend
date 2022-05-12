@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import Button from "../UI/Button/Button";
 import Modal from "../UI/Modal/Modal";
 //import Alert from "../UI/Alert/Alert";
