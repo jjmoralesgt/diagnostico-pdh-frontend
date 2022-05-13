@@ -1,36 +1,31 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import SucursalList from "../../Sucursal/SucursalList";
 import ReactPaginate from "react-paginate";
 
 const Table = (props) => {
-  
-    console.log("Table", props);
+  /*console.log("Table", props.items);*/
 
-  // We start with an empty list of items.
-  const [currentItems, setCurrentItems] = useState(null);
+  const [currentItems, setCurrentItems] = useState();
   const [pageCount, setPageCount] = useState(0);
-  // Here we use item offsets; we could also use page offsets
-  // following the API or data you're working with.
   const [itemOffset, setItemOffset] = useState(0);
 
   useEffect(() => {
-    // Fetch items from another resources.
+    console.log("Table", props.items);
     const endOffset = itemOffset + props.itemsPerPage;
     console.log(`Loading items from ${itemOffset} to ${endOffset}`);
     setCurrentItems(props.items.slice(itemOffset, endOffset));
     setPageCount(Math.ceil(props.items.length / props.itemsPerPage));
-  }, [itemOffset, props.itemsPerPage]);
+  }, [itemOffset, props.items]);
 
   // Invoke when user click to request another page.
   const handlePageClick = (event) => {
-    const newOffset = (event.selected * props.itemsPerPage) % props.items.length;
+    const newOffset =
+      (event.selected * props.itemsPerPage) % props.items.length;
     console.log(
       `User requested page number ${event.selected}, which is offset ${newOffset}`
     );
     setItemOffset(newOffset);
   };
-
-  console.log(props.itemsPerPage);
 
   return (
     <>
@@ -42,13 +37,13 @@ const Table = (props) => {
             <th>{props.dir}</th>
             <th>{props.tel}</th>
             <th>{props.pedidos}</th>
-            <th>{props.actions}</th> 
+            <th>{props.actions}</th>
           </tr>
         </thead>
         <tbody>
           <SucursalList
             items={currentItems}
-            onFetch={props.onFetch}
+            //onFetch={props.onFetch}
             openModal={props.openModal}
             onUpdateRow={props.onUpdateRow}
             onDeleteRow={props.onDeleteRow}
@@ -56,12 +51,12 @@ const Table = (props) => {
         </tbody>
       </table>
       <ReactPaginate
-        nextLabel="next >"
+        nextLabel="Siguiente >"
         onPageChange={handlePageClick}
         pageRangeDisplayed={3}
         marginPagesDisplayed={2}
         pageCount={pageCount}
-        previousLabel="< previous"
+        previousLabel="< Anterior"
         pageClassName="page-item"
         pageLinkClassName="page-link"
         previousClassName="page-item"

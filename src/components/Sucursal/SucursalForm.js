@@ -1,15 +1,16 @@
 import React, { useState, useContext } from "react";
 import Button from "../UI/Button/Button";
 import Modal from "../UI/Modal/Modal";
-//import Alert from "../UI/Alert/Alert";
 import SucursalContext from "../../store/sucursal-context";
 import "react-toastify/dist/ReactToastify.css";
 import Alert from "../UI/Alert/Alert";
 
 const SucursalForm = (props) => {
   const sucursalCtx = useContext(SucursalContext);
-  
+
   const [valores, setValores] = useState(sucursalCtx);
+
+  const [inputIsValid, setInputIsValid] = useState(true);
 
   const inputChangeHandler = (event) => {
     const { target } = event;
@@ -17,27 +18,37 @@ const SucursalForm = (props) => {
     const newValues = {
       ...valores,
       [name]: value,
-    };
-    setValores(newValues);
+    };   
+
+    setValores(newValues);    
   };
+
+  const nombreBlurHandler = () => {
+    if(valores.nombre.trim() === ''){
+      setInputIsValid(false);
+    }
+
+  }
+
+  const inputClasses = inputIsValid ? 'form-control' : 'form-control is-invalid';
 
   async function addSucursalHandler(sucursal) {
     const response = await fetch("http://127.0.0.1:8000/api/sucursal", {
-      method: "POST",      
+      method: "POST",
       body: JSON.stringify(sucursal),
       headers: {
-        "Content-Type": "application/json",       
+        "Content-Type": "application/json",
       },
     });
     const data = await response.json();
 
-    if(data.respuesta !== "success"){
-      Alert("warning", data.mensaje);      
-    } else {      
+    if (data.respuesta !== "success") {
+      Alert("warning", data.mensaje);
+    } else {
       setValores(valores);
-      props.onAddSucursal(valores);      
+      props.onAddSucursal(valores);
       Alert("success", data.mensaje);
-    }    
+    }
   }
 
   async function editSucursalHandler(sucursal) {
@@ -51,24 +62,40 @@ const SucursalForm = (props) => {
         },
       }
     );
-    const data = await response.json();    
-    if(data.respuesta !== "success"){
-      Alert("warning", data.mensaje);      
-    } else {            
+    const data = await response.json();
+    if (data.respuesta !== "success") {
+      Alert("warning", data.mensaje);
+    } else {
       props.onUpdateSucursal(valores);
       Alert("success", data.mensaje);
-    }   
+    }
   }
 
   function submitHandler(event) {
     event.preventDefault();
-    if (sucursalCtx.id > 0) {
-      editSucursalHandler(valores);     
+
+    if (
+      valores.nombre.trim().length === 0 ||
+      valores.nombre_admin.trim().length === 0 ||
+      valores.direccion.trim().length === 0 ||
+      valores.telefono.trim().length === 0
+    ) {
+      setInputIsValid(true);
+      Alert(
+        "error",
+        "Favor de llenar los campos nombre, administrador, dirección y teléfono"
+      );
+      
+      return;
     } else {
-      addSucursalHandler(valores);     
+      if (sucursalCtx.id > 0) {
+        editSucursalHandler(valores);
+      } else {
+        addSucursalHandler(valores);
+      }
+      props.onClose();
     }
-    props.onClose();
-    
+  
   }
 
   return (
@@ -80,26 +107,27 @@ const SucursalForm = (props) => {
             Nombre
           </label>
           <input
-            className="form-control"
+            className={inputClasses}
             id="nombre"
             name="nombre"
             type="text"
             onChange={inputChangeHandler}
-            value={valores.nombre}
-            required
+            onBlur={nombreBlurHandler}
+            value={valores.nombre}            
           />
+          {!inputIsValid && <p className="text-danger">Nombre es un campo obligatorio</p>}
         </div>
         <div className="mb-3">
           <label htmlFor="admin" className="form-label">
             Nombre de adminstrador
           </label>
           <input
-            className="form-control"
+            className={inputClasses}
             id="nombre_admin"
             name="nombre_admin"
             type="text"
             onChange={inputChangeHandler}
-            value={valores.nombre_admin}
+            value={valores.nombre_admin}            
           />
         </div>
         <div className="mb-3">
@@ -107,12 +135,12 @@ const SucursalForm = (props) => {
             Teléfono
           </label>
           <input
-            className="form-control"
+            className={inputClasses}
             id="telefono"
             name="telefono"
             type="text"
             onChange={inputChangeHandler}
-            value={valores.telefono}
+            value={valores.telefono}            
           />
         </div>
         <div className="mb-3">
@@ -120,12 +148,12 @@ const SucursalForm = (props) => {
             Dirección
           </label>
           <input
-            className="form-control"
+            className={inputClasses}
             id="direccion"
             name="direccion"
             type="text"
             onChange={inputChangeHandler}
-            value={valores.direccion}
+            value={valores.direccion}            
           />
         </div>
         <div className="mb-3">
@@ -133,12 +161,12 @@ const SucursalForm = (props) => {
             Fax
           </label>
           <input
-            className="form-control"
+            className={inputClasses}
             id="fax"
             name="fax"
             type="text"
             onChange={inputChangeHandler}
-            value={valores.fax}
+            value={valores.fax}            
           />
         </div>
         <div className="mb-3">
@@ -146,7 +174,7 @@ const SucursalForm = (props) => {
             Cantidad de pedidos
           </label>
           <input
-            className="form-control"
+            className={inputClasses}
             id="cantidad_pedidos"
             name="cantidad_pedidos"
             type="number"

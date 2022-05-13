@@ -1,43 +1,40 @@
 import { useState, useEffect } from "react";
 import { ToastContainer } from "react-toastify";
-import useHttp from "./hooks/use-http";
 import SucursalProvider from "./store/SucursalProvider";
 import Button from "./components/UI/Button/Button";
 import SucursalForm from "./components/Sucursal/SucursalForm";
+import Table from "./components/UI/Table/Table";
 import Swal from "sweetalert2";
 import Alert from "./components/UI/Alert/Alert";
 import "bootstrap/dist/css/bootstrap.min.css";
-//import SucursalList from "./components/Sucursal/SucursalList copy";
-import Table from "./components/UI/Table/Table";
 
 function App() {
   const [sucursals, setSucursals] = useState([]);
-
-  const { sendRequest: fetchSucursals } = useHttp();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const transformSucursal = (sucursalObj) => {
-      const loadedSucursals = [];
-
-      for (const sucursalKey in sucursalObj) {
-        loadedSucursals.push({
-          id: sucursalObj[sucursalKey].id,
-          nombre: sucursalObj[sucursalKey].nombre,
-          nombre_admin: sucursalObj[sucursalKey].nombre_admin,
-          telefono: sucursalObj[sucursalKey].telefono,
-          direccion: sucursalObj[sucursalKey].direccion,
-          fax: sucursalObj[sucursalKey].fax,
-          cantidad_pedidos: sucursalObj[sucursalKey].cantidad_pedidos,
-        });
-      }
-
-      setSucursals(loadedSucursals);
-    };
-    fetchSucursals(
-      { url: "http://127.0.0.1:8000/api/sucursal" },
-      transformSucursal
-    );
-  }, [fetchSucursals]);
+    fetch("http://127.0.0.1:8000/api/sucursal")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            Alert("success", `Este es un error HTTP: El estado es ${response.status}`)            
+          );
+        }
+        return response.json();
+      })
+      .then((actualData) => {
+        setSucursals(actualData);
+        setError(null);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setSucursals(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   const datos = {
     id: "",
@@ -63,11 +60,21 @@ function App() {
   const dataUpdate = rows;
 
   const updateSucursalHandler = (sucursal) => {
-    const lastSucursals = sucursals.filter((data) => data.id !== sucursal.id);
+    const lastSucursals = sucursals.map((data) =>
+      data.id === sucursal.id
+        ? {
+            ...data,
+            id: sucursal.id,
+            nombre: sucursal.nombre,
+            nombre_admin: sucursal.nombre_admin,
+            telefono: sucursal.telefono,
+            direccion: sucursal.direccion,
+            fax: sucursal.fax,
+            cantidad_pedidos: sucursal.cantidad_pedidos,
+          }
+        : data
+    );
     setSucursals(lastSucursals);
-    setSucursals((prevSucursals) => {
-      return [sucursal, ...prevSucursals];
-    });
   };
 
   async function deleteRowHandler(sucursal) {
@@ -150,12 +157,11 @@ function App() {
             actions="Acciones"
             pedidos="Cant. Pedidos"
             items={sucursals}
-            onFetch={fetchSucursals}
             openModal={showModalHandler}
             onUpdateRow={setDataUpdateSucursalHandler}
             onDeleteRow={confirmDeleteHandler}
             itemsPerPage={10}
-          />   
+          />
           <ToastContainer />
         </div>
       </div>
