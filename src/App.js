@@ -9,8 +9,7 @@ import Alert from "./components/UI/Alert/Alert";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
-  const [sucursals, setSucursals] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [sucursals, setSucursals] = useState([]);  
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -30,10 +29,8 @@ function App() {
       .catch((err) => {
         setError(err.message);
         setSucursals(null);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+        console.log(error);
+      })      
   }, []);
 
   const datos = {
@@ -75,6 +72,7 @@ function App() {
         : data
     );
     setSucursals(lastSucursals);
+    setRows(datos);
   };
 
   async function deleteRowHandler(sucursal) {

@@ -7,7 +7,7 @@ import Alert from "../UI/Alert/Alert";
 
 const SucursalForm = (props) => {
   const sucursalCtx = useContext(SucursalContext);
-
+  console.log("context", sucursalCtx);
   const [valores, setValores] = useState(sucursalCtx);
 
   const [inputIsValid, setInputIsValid] = useState(true);
@@ -21,16 +21,7 @@ const SucursalForm = (props) => {
     };   
 
     setValores(newValues);    
-  };
-
-  const nombreBlurHandler = () => {
-    if(valores.nombre.trim() === ''){
-      setInputIsValid(false);
-    }
-
-  }
-
-  const inputClasses = inputIsValid ? 'form-control' : 'form-control is-invalid';
+  }; 
 
   async function addSucursalHandler(sucursal) {
     const response = await fetch("http://127.0.0.1:8000/api/sucursal", {
@@ -63,9 +54,11 @@ const SucursalForm = (props) => {
       }
     );
     const data = await response.json();
+
     if (data.respuesta !== "success") {
+      
       Alert("warning", data.mensaje);
-    } else {
+    } else {            
       props.onUpdateSucursal(valores);
       Alert("success", data.mensaje);
     }
@@ -73,7 +66,7 @@ const SucursalForm = (props) => {
 
   function submitHandler(event) {
     event.preventDefault();
-
+    console.log("valores: ", valores);
     if (
       valores.nombre.trim().length === 0 ||
       valores.nombre_admin.trim().length === 0 ||
@@ -107,12 +100,11 @@ const SucursalForm = (props) => {
             Nombre
           </label>
           <input
-            className={inputClasses}
+            className="form-control"
             id="nombre"
             name="nombre"
             type="text"
-            onChange={inputChangeHandler}
-            onBlur={nombreBlurHandler}
+            onChange={inputChangeHandler}            
             value={valores.nombre}            
           />
           {!inputIsValid && <p className="text-danger">Nombre es un campo obligatorio</p>}
@@ -122,7 +114,7 @@ const SucursalForm = (props) => {
             Nombre de adminstrador
           </label>
           <input
-            className={inputClasses}
+            className="form-control"
             id="nombre_admin"
             name="nombre_admin"
             type="text"
@@ -135,7 +127,7 @@ const SucursalForm = (props) => {
             Teléfono
           </label>
           <input
-            className={inputClasses}
+            className="form-control"
             id="telefono"
             name="telefono"
             type="text"
@@ -148,7 +140,7 @@ const SucursalForm = (props) => {
             Dirección
           </label>
           <input
-            className={inputClasses}
+            className="form-control"
             id="direccion"
             name="direccion"
             type="text"
@@ -161,7 +153,7 @@ const SucursalForm = (props) => {
             Fax
           </label>
           <input
-            className={inputClasses}
+            className="form-control"
             id="fax"
             name="fax"
             type="text"
@@ -174,7 +166,7 @@ const SucursalForm = (props) => {
             Cantidad de pedidos
           </label>
           <input
-            className={inputClasses}
+            className="form-control"
             id="cantidad_pedidos"
             name="cantidad_pedidos"
             type="number"
